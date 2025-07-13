@@ -1,8 +1,10 @@
 import telebot
 import random
+import os
 from telebot import types
 from flask import Flask
 from threading import Thread
+
 
 # === UptimeRobot Keep-Alive ===
 app = Flask('')
@@ -25,7 +27,7 @@ def keep_alive():
 keep_alive()
 
 # Token einfügen
-TOKEN = "7527878772:AAH2_nOWRXDvRVgfJGSdwb2JyJuQJCNutHc"
+TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 # === Trigger: HILFE ===
