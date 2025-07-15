@@ -30,27 +30,31 @@ keep_alive()
 TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
-# === Trigger: HILFE ===
-hilfe_nachrichten = [
+# === Trigger: IMPULSSTOPP ===
+impulsstopp_nachrichten = [
     "😌 *Psychological Sigh:*\n2x durch die Nase einatmen, 1x lang ausatmen durch den Mund. 3x wiederholen – wirkt sofort gegen Stress und Impulse.",
     "🧊 *Musterunterbrechung:*\nStell dir dein Lieblingsessen eiskalt & geschmacklos vor. Oder: Geh Zähne putzen – dein Gehirn bekommt ein neues Signal: *„Ich bin fertig.“*",
     "🎁 *Mini-Reframing:*\n„Das, was du jetzt widerstehst, macht dich stärker als alles, was du essen könntest.“\n*Kurzfristiger Verzicht – langfristiger Stolz.*",
     "🎲 *Sofort-Ablenkungsspiel:*\nDenk an 3 Dinge, die du auch gern magst, die aber gesund sind (z. B. Kefir, Nüsse, Tee). Nimm das erste. Der Impuls wird umlenkt.",
     "🧠 *WOOP gegen Heißhunger:*\nWish: Klar bleiben\nOutcome: Leicht fühlen\nObstacle: Süßhunger\nPlan: 3x tief durchatmen, 1 Glas Wasser, 5 Min warten – oft reicht das schon.",
-    "🗣️ *Selbstgespräch stoppen (nach Ethan Kross):*\n„Stopp, {name}, das brauchst du gerade nicht wirklich.“\nSprich mit dir in der dritten Person – das schafft Abstand zum Impuls."
+    "🗣️ *Selbstgespräch stoppen (nach Ethan Kross):*\n„Stopp, {name}, das brauchst du gerade nicht wirklich.“\nSprich mit dir in der dritten Person – das schafft Abstand zum Impuls.",
+    "🎯 *Fantasie-Ort aktivieren:*\nSchließ die Augen. Stell dir vor, du sitzt auf einem Berggipfel, Wind im Gesicht, Ruhe pur. Halte dieses Bild 15 Sekunden.",
+    "🎲 *Würfelspiel-Ablenkung:*\nDenk dir 3 kleine Aufgaben:\n1️⃣ Hampelmann\n2️⃣ Lied summen\n3️⃣ Wasser holen\nLass den Zufall entscheiden – und tu’s einfach!",
+    "🍬 *Marshmallow-Trick (Stanford-Studie):*\nStell dir vor, du bekommst dein Lieblingsessen – aber *doppelt so gut*, wenn du 10 Minuten wartest. *Belohnung verschieben = Stärke gewinnen.*"
 ]
 
-hilfe_bilder = [
+impulsstopp_bilder = [
     "https://images.unsplash.com/photo-1523978591478-c753949ff840?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
 ]
 
 
-@bot.message_handler(commands=['hilfe'])
-def sende_hilfe(message):
+
+@bot.message_handler(commands=['impulsstopp'])
+def sende_impulsstopp(message):
     name = message.from_user.first_name if message.from_user.first_name else "Du"
-    text = random.choice(hilfe_nachrichten).replace("{name}", name)
-    bild = random.choice(hilfe_bilder)
+    text = random.choice(impulsstopp_nachrichten).replace("{name}", name)
+    bild = random.choice(impulsstopp_bilder)
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
     bot.send_photo(message.chat.id, bild)
 
@@ -131,7 +135,7 @@ def sende_start(message):
                     "Wähle eine Option:")
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = types.KeyboardButton("🆘 Hilfe")
+    btn1 = types.KeyboardButton("🔥 Impulsstopp")
     btn2 = types.KeyboardButton("🧘 Ruhe")
     btn3 = types.KeyboardButton("🚀 Motivation")
     btn4 = types.KeyboardButton("😄 Laune")
@@ -141,9 +145,9 @@ def sende_start(message):
 
 
 # === Button Handlers ===
-@bot.message_handler(func=lambda message: message.text == "🆘 Hilfe")
-def help_button_handler(message):
-    sende_hilfe(message)
+@bot.message_handler(func=lambda message: message.text == "🔥 Impulsstopp")
+def impulsstopp_button_handler(message):
+    sende_impulsstopp(message)
 
 
 @bot.message_handler(func=lambda message: message.text == "🧘 Ruhe")
