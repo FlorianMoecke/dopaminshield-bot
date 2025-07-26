@@ -187,8 +187,10 @@ def handle_freetext(message):
         antwort = response.choices[0].message.content
         bot.send_message(message.chat.id, antwort)
 
-    except Exception:
-        bot.send_message(message.chat.id, "⚠️ Die KI ist gerade nicht erreichbar.")
+    except Exception as e:
+        bot.send_message(message.chat.id, f"⚠️ OpenAI-Fehler: {type(e).__name__} – {str(e)}")
+        print(f"❌ GPT-Fehler: {repr(e)}")
+        
 # === Starte den Bot über Webhook ===
 @app.route(f'/{TOKEN}', methods=['POST'])
 def webhook():
