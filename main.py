@@ -4,7 +4,7 @@ import os
 import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
 from telebot import types
-from flask import Flask
+from flask import Flask, request
 from threading import Thread
 
 
@@ -199,6 +199,14 @@ Sei motivierend, aber direkt. Keine künstliche Höflichkeit.
         bot.send_message(message.chat.id, "⚠️ Die KI ist gerade nicht erreichbar.")
         print(f"Fehler bei OpenAI: {e}")
 
-# === Starte den Bot ===
-print("Bot läuft...")
-bot.infinity_polling()
+# === Starte den Bot über Webhook ===
+@app.route(f'/{TOKEN}', methods=['POST'])
+def webhook():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return '', 200
+
+bot.remove_webhook()
+bot.set_webhook(url=f'https://dopaminshield.onrender.com/{TOKEN}')
+print("Bot läuft... (Webhook-Modus)")
