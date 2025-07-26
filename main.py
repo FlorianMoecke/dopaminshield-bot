@@ -168,27 +168,14 @@ def handle_freetext(message):
     name = message.from_user.first_name or "Du"
 
     prompt = f"""
-Du bist ein hilfsbereiter, empathischer Telegram-Coach für Selbstkontrolle, Motivation und Stimmung. 
-Der Nutzer heißt {name}. Er hat dir folgendes geschrieben:
-
-„{user_input}“
-
-Antworte in 2–3 Sätzen freundlich, nutze einfache Sprache. 
-Wenn sinnvoll, schlage ihm passende Techniken aus folgenden Kategorien vor:
-- Impulsstopp
-- Motivation
-- Ruhe
-- Laune
-
-Greife auf diese Tools zurück (nur sinngemäß): Impulsstopp, Motivation, Ruhe, Laune. 
-Du kannst Techniken wie Selbstgespräch, Reframing, Bewegung oder Atemübung vorschlagen.
-
-Sei motivierend, aber direkt. Keine künstliche Höflichkeit.
-"""
+    [dein Prompttext...]
+    """
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # oder gpt-4o
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Du bist ein motivierender Telegram-Coach."},
                 {"role": "user", "content": prompt}
@@ -196,14 +183,12 @@ Sei motivierend, aber direkt. Keine künstliche Höflichkeit.
             temperature=0.7,
             max_tokens=300
         )
+
         antwort = response.choices[0].message.content
         bot.send_message(message.chat.id, antwort)
 
-    except Exception as e:
-        error_text = f"⚠️ OpenAI-Fehler: {type(e).__name__} – {str(e)}"
-        bot.send_message(message.chat.id, error_text)
-        print(f"❌ GPT-Fehler: {repr(e)}")
-
+    except Exception:
+        bot.send_message(message.chat.id, "⚠️ Die KI ist gerade nicht erreichbar.")
 # === Starte den Bot über Webhook ===
 @app.route(f'/{TOKEN}', methods=['POST'])
 def webhook():
