@@ -190,27 +190,46 @@ def handle_greeting(message):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_freetext(message):
+    user_input = message.text
+    name = message.from_user.first_name or "Du"
+
+    prompt = f"""
+Du bist ein hilfsbereiter, empathischer Telegram-Coach für Selbstkontrolle, Motivation und Stimmung. 
+Der Nutzer heißt {name}. Er hat dir folgendes geschrieben:
+
+„{user_input}“
+
+Antworte in 2–3 Sätzen freundlich, nutze einfache Sprache. 
+Wenn sinnvoll, schlage ihm passende Techniken aus folgenden Kategorien vor:
+- Impulsstopp
+- Motivation
+- Ruhe
+- Laune
+"""
+
     try:
-    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "Du bist ein motivierender Telegram-Coach."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=300
-    )
-    antwort = response.choices[0].message.content
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Du bist ein motivierender Telegram-Coach."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=300
+        )
+        antwort = response.choices[0].message.content
+        bot.send_message(message.chat.id, antwort)
 
-except openai.RateLimitError:
-    antwort = "⚠️ KI ist gerade überlastet. Bitte später nochmal versuchen."
+    except openai.RateLimitError:
+        bot.send_message(message.chat.id, "⚠️ KI ist gerade überlastet. Bitte später nochmal.")
 
-except openai.AuthenticationError:
-    antwort = "⚠️ API-Key ist ungültig oder fehlt. Bitte prüfen."
+    except openai.AuthenticationError:
+        bot.send_message(message.chat.id, "⚠️ API-Key ungültig oder fehlt.")
 
-except Exception as e:
-    antwort = "⚠️ KI nicht erreichbar"
+    except Exception as e:
+        print(f"OpenAI Fehler: {type(e).__name__} – {e}")
+        bot.send_message(message.chat.id, "⚠️ KI nicht erreichbar.")
         
 # === Starte den Bot über Webhook ===
 @app.route(f'/{TOKEN}', methods=['POST'])
