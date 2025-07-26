@@ -190,7 +190,7 @@ def handle_greeting(message):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_freetext(message):
-try:
+    try:
     client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     response = client.chat.completions.create(
         model="gpt-4o",
