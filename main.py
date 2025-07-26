@@ -92,7 +92,7 @@ def sende_laune(message):
 def toolbox_menu(message):
     markup = types.InlineKeyboardMarkup()
     markup.row(
-        types.InlineKeyboardButton("🔥 Impulsstopp", callback_data='tool_impulsstop'),
+        types.InlineKeyboardButton("🔥 Impulsstopp", callback_data='tool_impulsstopp'),
         types.InlineKeyboardButton("🚀 Motivation", callback_data='tool_motivation')
     )
     markup.row(
