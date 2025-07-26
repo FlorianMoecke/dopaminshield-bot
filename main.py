@@ -103,13 +103,13 @@ def toolbox_menu(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('tool_'))
 def sende_toolbox_inhalt(call):
-    data = call.data.split('_')[1]
+    key = call.data.split('_')[1]  # ergibt jetzt z. B. 'impulsstopp'
     name = call.from_user.first_name or "Du"
 
-    if data in inhalte:
-        text = random.choice(inhalte[data]['nachrichten']).replace("{name}", name)
-        bild = random.choice(inhalte[data]['bilder'])
-        bot.send_message(call.message.chat.id, f"🧰 *{data.capitalize()}*\n\n{text}", parse_mode='Markdown')
+    if key in inhalte:
+        text = random.choice(inhalte[key]['nachrichten']).replace("{name}", name)
+        bild = random.choice(inhalte[key]['bilder'])
+        bot.send_message(call.message.chat.id, f"🧰 *{key.capitalize()}*\n\n{text}", parse_mode='Markdown')
         bot.send_photo(call.message.chat.id, bild)
     else:
         bot.send_message(call.message.chat.id, "⚠️ Kategorie nicht gefunden.")
