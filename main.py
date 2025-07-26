@@ -200,9 +200,9 @@ Sei motivierend, aber direkt. Keine künstliche Höflichkeit.
         bot.send_message(message.chat.id, antwort)
 
     except Exception as e:
-    error_text = f"⚠️ OpenAI-Fehler: {type(e).__name__} – {str(e)}"
-    bot.send_message(message.chat.id, error_text)
-    print(f"❌ GPT-Fehler: {repr(e)}")
+        error_text = f"⚠️ OpenAI-Fehler: {type(e).__name__} – {str(e)}"
+        bot.send_message(message.chat.id, error_text)
+        print(f"❌ GPT-Fehler: {repr(e)}")
 
 # === Starte den Bot über Webhook ===
 @app.route(f'/{TOKEN}', methods=['POST'])
