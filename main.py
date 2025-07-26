@@ -86,7 +86,34 @@ def sende_laune(message):
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
     bot.send_photo(message.chat.id, bild)
 
+# === ToolboxE ===
 
+@bot.message_handler(commands=['toolbox'])
+def toolbox_menu(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.row(
+        types.InlineKeyboardButton("🔥 Impulsstopp", callback_data='tool_impuls'),
+        types.InlineKeyboardButton("🚀 Motivation", callback_data='tool_motivation')
+    )
+    markup.row(
+        types.InlineKeyboardButton("😄 Laune", callback_data='tool_laune'),
+        types.InlineKeyboardButton("🧘 Ruhe", callback_data='tool_ruhe')
+    )
+    bot.send_message(message.chat.id, "🧰 *Wähle eine Toolbox-Kategorie:*", reply_markup=markup, parse_mode='Markdown')
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('tool_'))
+def sende_toolbox_inhalt(call):
+    data = call.data.split('_')[1]
+    name = call.from_user.first_name or "Du"
+
+    if data in inhalte:
+        text = random.choice(inhalte[data]['nachrichten']).replace("{name}", name)
+        bild = random.choice(inhalte[data]['bilder'])
+        bot.send_message(call.message.chat.id, f"🧰 *{data.capitalize()}*\n\n{text}", parse_mode='Markdown')
+        bot.send_photo(call.message.chat.id, bild)
+    else:
+        bot.send_message(call.message.chat.id, "⚠️ Kategorie nicht gefunden.")
+        
 # === START ===
 @bot.message_handler(commands=['start'])
 def sende_start(message):
@@ -98,7 +125,9 @@ def sende_start(message):
     btn2 = types.KeyboardButton("🧘 Ruhe")
     btn3 = types.KeyboardButton("🚀 Motivation")
     btn4 = types.KeyboardButton("😄 Laune")
-    markup.add(btn1, btn2, btn3, btn4)
+    btn5 = types.KeyboardButton("🧰 Toolbox")
+    markup.add(btn1, btn2, btn3, btn4, btn5)
+    
 
     bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
 
@@ -123,7 +152,10 @@ def motivation_button_handler(message):
 def laune_button_handler(message):
     sende_laune(message)
 
-
+@bot.message_handler(func=lambda message: message.text == "🧰 Toolbox")
+def toolbox_button_handler(message):
+    toolbox_menu(message)
+    
 # === Starte den Bot ===
 print("Bot läuft...")
 bot.infinity_polling()
