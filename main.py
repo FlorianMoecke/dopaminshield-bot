@@ -8,6 +8,31 @@ from telebot import types
 from flask import Flask, request
 from threading import Thread
 
+import json
+
+# JSON-Datei für User-Daten
+USER_DATA_FILE = "user_data.json"
+
+# Lade Userdaten oder erstelle neue Datei
+try:
+    with open(USER_DATA_FILE, "r") as f:
+        user_data = json.load(f)
+except FileNotFoundError:
+    user_data = {}
+
+def save_user_data():
+    with open(USER_DATA_FILE, "w") as f:
+        json.dump(user_data, f, indent=2)
+
+def update_user(user_id, key, value):
+    uid = str(user_id)
+    if uid not in user_data:
+        user_data[uid] = {}
+    user_data[uid][key] = value
+    save_user_data()
+
+def get_user_value(user_id, key, default=None):
+    return user_data.get(str(user_id), {}).get(key, default)
 
 # === UptimeRobot Keep-Alive ===
 app = Flask('')
