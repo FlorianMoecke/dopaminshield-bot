@@ -230,9 +230,12 @@ Nutze bei Bedarf diese Toolbox:
         antwort = response.choices[0].message.content.strip()
         bot.send_message(message.chat.id, antwort)
 
-    except Exception as e:
-        print(f"OpenAI Fehler: {type(e).__name__} – {str(e)}")
-        bot.send_message(message.chat.id, "⚠️ KI nicht erreichbar.")
+except openai.RateLimitError:
+    antwort = "⚠️ KI hat gerade zu viele Anfragen. Bitte später nochmal!"
+except openai.AuthenticationError:
+    antwort = "⚠️ API-Key scheint nicht gültig. Bitte prüfen."
+except Exception as e:
+    antwort = f"⚠️ KI nicht erreichbar: {type(e).__name__}"
         
 # === Starte den Bot über Webhook ===
 @app.route(f'/{TOKEN}', methods=['POST'])
