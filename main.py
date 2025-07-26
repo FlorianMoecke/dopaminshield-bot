@@ -1,6 +1,8 @@
 import telebot
 import random
 import os
+import openai
+openai.api_key = os.getenv("OPENAI_API_KEY")
 from telebot import types
 from flask import Flask
 from threading import Thread
@@ -155,7 +157,48 @@ def laune_button_handler(message):
 @bot.message_handler(func=lambda message: message.text == "🧰 Toolbox")
 def toolbox_button_handler(message):
     toolbox_menu(message)
-    
+
+@bot.message_handler(func=lambda message: True)
+def handle_freetext(message):
+    user_input = message.text
+    name = message.from_user.first_name or "Du"
+
+    prompt = f"""
+Du bist ein hilfsbereiter, empathischer Telegram-Coach für Selbstkontrolle, Motivation und Stimmung. 
+Der Nutzer heißt {name}. Er hat dir folgendes geschrieben:
+
+„{user_input}“
+
+Antworte in 2–3 Sätzen freundlich, nutze einfache Sprache. 
+Wenn sinnvoll, schlage ihm passende Techniken aus folgenden Kategorien vor:
+- Impulsstopp
+- Motivation
+- Ruhe
+- Laune
+
+Greife auf folgende Tools zurück, wenn sie passen:
+{json.dumps(inhalte, ensure_ascii=False, indent=2)[:3500]}  # nur Teilauszug
+
+Sei motivierend, aber direkt. Keine künstliche Höflichkeit.
+"""
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # oder gpt-4o
+            messages=[
+                {"role": "system", "content": "Du bist ein motivierender Telegram-Coach."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=300
+        )
+        antwort = response.choices[0].message.content
+        bot.send_message(message.chat.id, antwort)
+
+    except Exception as e:
+        bot.send_message(message.chat.id, "⚠️ Die KI ist gerade nicht erreichbar.")
+        print(f"Fehler bei OpenAI: {e}")
+
 # === Starte den Bot ===
 print("Bot läuft...")
 bot.infinity_polling()
