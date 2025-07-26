@@ -190,52 +190,27 @@ def handle_greeting(message):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_freetext(message):
-    try:
-        # Dynamischer Prompt mit Zeitstempel
-        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
-        prompt = f"""
-Florian hat dir um {timestamp} folgendes geschrieben:
-
-„{message.text}“
-
-Antworte als emphatischer, klarer Coach in maximal 3 Sätzen. Sei direkt, wissenschaftlich fundiert und pragmatisch – wie ein kluger, verständnisvoller Freund.  
-Sprich Florian mit „du“ an.
-
-Biete passende Tools aus folgenden Bereichen an:
-- Impulsstopp
-- Motivation
-- Ruhe
-- Laune
-
-Nutze bei Bedarf diese Toolbox:
-
-🧘 Ruhe-Tool: Atemübung (4-7-8)  
-🚀 Motivation: Mini-Ziel setzen + Belohnung  
-🆘 Impulsstop: 90-Sekunden-Regel  
-😄 Laune-Booster: 3 Dinge aufschreiben, die gut laufen
-"""
-
-        # GPT-4o API call
-        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "Du bist ein motivierender Telegram-Coach."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=300
-        )
-
-        antwort = response.choices[0].message.content.strip()
-        bot.send_message(message.chat.id, antwort)
+try:
+    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Du bist ein motivierender Telegram-Coach."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=300
+    )
+    antwort = response.choices[0].message.content
 
 except openai.RateLimitError:
-    antwort = "⚠️ KI hat gerade zu viele Anfragen. Bitte später nochmal!"
+    antwort = "⚠️ KI ist gerade überlastet. Bitte später nochmal versuchen."
+
 except openai.AuthenticationError:
-    antwort = "⚠️ API-Key scheint nicht gültig. Bitte prüfen."
+    antwort = "⚠️ API-Key ist ungültig oder fehlt. Bitte prüfen."
+
 except Exception as e:
-    antwort = f"⚠️ KI nicht erreichbar: {type(e).__name__}"
+    antwort = "⚠️ KI nicht erreichbar"
         
 # === Starte den Bot über Webhook ===
 @app.route(f'/{TOKEN}', methods=['POST'])
