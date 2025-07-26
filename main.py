@@ -158,6 +158,10 @@ def laune_button_handler(message):
 def toolbox_button_handler(message):
     toolbox_menu(message)
 
+@bot.message_handler(func=lambda message: message.text.lower() in ['hi', 'hallo', 'start', 'hey', 'servus'])
+def handle_greeting(message):
+    sende_start(message)
+
 @bot.message_handler(func=lambda message: True)
 def handle_freetext(message):
     user_input = message.text
