@@ -180,8 +180,8 @@ Wenn sinnvoll, schlage ihm passende Techniken aus folgenden Kategorien vor:
 - Ruhe
 - Laune
 
-Greife auf folgende Tools zurück, wenn sie passen:
-{json.dumps(inhalte, ensure_ascii=False, indent=2)[:3500]}  # nur Teilauszug
+Greife auf diese Tools zurück (nur sinngemäß): Impulsstopp, Motivation, Ruhe, Laune. 
+Du kannst Techniken wie Selbstgespräch, Reframing, Bewegung oder Atemübung vorschlagen.
 
 Sei motivierend, aber direkt. Keine künstliche Höflichkeit.
 """
