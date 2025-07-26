@@ -1,6 +1,7 @@
 import telebot
 import random
 import os
+from datetime import datetime
 import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
 from telebot import types
@@ -162,20 +163,37 @@ def toolbox_button_handler(message):
 def handle_greeting(message):
     sende_start(message)
 
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_freetext(message):
-    user_input = message.text
-    name = message.from_user.first_name or "Du"
-
-    prompt = f"""
-    [dein Prompttext...]
-    """
-
     try:
-        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        # Dynamischer Prompt mit Zeitstempel
+        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+        prompt = f"""
+Florian hat dir um {timestamp} folgendes geschrieben:
 
+„{message.text}“
+
+Antworte als emphatischer, klarer Coach in maximal 3 Sätzen. Sei direkt, wissenschaftlich fundiert und pragmatisch – wie ein kluger, verständnisvoller Freund.  
+Sprich Florian mit „du“ an.
+
+Biete passende Tools aus folgenden Bereichen an:
+- Impulsstopp
+- Motivation
+- Ruhe
+- Laune
+
+Nutze bei Bedarf diese Toolbox:
+
+🧘 Ruhe-Tool: Atemübung (4-7-8)  
+🚀 Motivation: Mini-Ziel setzen + Belohnung  
+🆘 Impulsstop: 90-Sekunden-Regel  
+😄 Laune-Booster: 3 Dinge aufschreiben, die gut laufen
+"""
+
+        # GPT-4o API call
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "Du bist ein motivierender Telegram-Coach."},
                 {"role": "user", "content": prompt}
@@ -184,11 +202,12 @@ def handle_freetext(message):
             max_tokens=300
         )
 
-        antwort = response.choices[0].message.content
+        antwort = response.choices[0].message.content.strip()
         bot.send_message(message.chat.id, antwort)
 
-    except Exception:
-        bot.send_message(message.chat.id, "⚠️ Die KI ist gerade nicht erreichbar.")
+    except Exception as e:
+        print(f"OpenAI Fehler: {type(e).__name__} – {str(e)}")
+        bot.send_message(message.chat.id, "⚠️ KI nicht erreichbar.")
         
 # === Starte den Bot über Webhook ===
 @app.route(f'/{TOKEN}', methods=['POST'])
